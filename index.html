@@ -19,12 +19,21 @@
     .option-btn.correct { background: linear-gradient(to right, #22c55e, #16a34a); color: white; border-color: #16a34a; }
     .option-btn.wrong { background: linear-gradient(to right, #f87171, #ef4444); color: white; border-color: #ef4444; }
     .option-btn:not(:disabled):hover { transform: translateY(-1px); }
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
   </style>
 </head>
 <body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 min-h-screen flex items-center justify-center p-4">
+  <canvas id="confetti-canvas" aria-hidden="true"></canvas>
   <main id="app" class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-6 md:p-10 border-8 border-yellow-300 relative overflow-hidden">
     <div class="absolute -top-6 -right-6 text-6xl opacity-20" aria-hidden="true">⭐</div>
     <div class="absolute -bottom-6 -left-6 text-6xl opacity-20" aria-hidden="true">🎈</div>
@@ -36,9 +45,7 @@
     </div>
 
     <section id="welcome-screen" class="text-center space-y-6">
-      <div class="inline-block bg-yellow-400 text-yellow-900 px-6 py-2 rounded-full font-bold text-lg shadow-md uppercase tracking-wider">
-        ¡Editorial ANAYA • EMAT 3.º Primaria! 🎒
-      </div>
+      <div class="inline-block bg-yellow-400 text-yellow-900 px-6 py-2 rounded-full font-bold text-lg shadow-md uppercase tracking-wider">¡Editorial ANAYA • EMAT 3.º Primaria! 🎒</div>
       <h1 class="text-4xl md:text-5xl font-bold text-purple-700 leading-tight">¡La Gran Aventura de las Matemáticas! 🦁⛵</h1>
       <p class="text-gray-600 text-lg">Prepárate para superar este súper reto con piratas, cohetes y muchos números. ¡Demuestra todo lo que sabes!</p>
       <div class="flex justify-center items-center space-x-4 py-4" aria-hidden="true">
@@ -46,9 +53,7 @@
         <span class="text-5xl bounce-custom" style="animation-delay: 0.2s;">🚀</span>
         <span class="text-5xl bounce-custom" style="animation-delay: 0.4s;">🧩</span>
       </div>
-      <button onclick="startQuiz()" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white font-bold text-2xl py-4 rounded-2xl shadow-lg transition transform hover:scale-105 cursor-pointer">
-        ¡Comenzar el Reto! 🎮
-      </button>
+      <button onclick="startQuiz()" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white font-bold text-2xl py-4 rounded-2xl shadow-lg transition transform hover:scale-105 cursor-pointer">¡Comenzar el Reto! 🎮</button>
     </section>
 
     <section id="quiz-screen" class="hidden space-y-6" aria-live="polite">
@@ -56,7 +61,7 @@
         <span id="question-category" class="font-bold text-purple-700 text-sm md:text-base">Materia</span>
         <span id="question-counter" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-sm font-bold">Pregunta 1 de 9</span>
       </div>
-      <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden" role="progressbar" aria-label="Progreso del cuestionario" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0">
+      <div id="progress-track" class="w-full bg-gray-200 h-3 rounded-full overflow-hidden" role="progressbar" aria-label="Progreso del cuestionario" aria-valuemin="0" aria-valuemax="9" aria-valuenow="0">
         <div id="progress-bar" class="bg-yellow-400 h-full transition-all duration-300" style="width: 0%;"></div>
       </div>
       <div class="bg-yellow-50 border-4 border-yellow-200 p-6 rounded-2xl text-center">
@@ -66,9 +71,7 @@
       <div id="feedback-container" class="hidden p-4 rounded-2xl text-center transition-all" aria-live="assertive">
         <p id="feedback-title" class="font-bold text-lg mb-1"></p>
         <p id="feedback-text" class="text-sm md:text-base"></p>
-        <button id="next-btn" onclick="nextQuestion()" class="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-2 rounded-xl shadow-md transition transform hover:scale-105 cursor-pointer">
-          Siguiente Pregunta ➡️
-        </button>
+        <button id="next-btn" onclick="nextQuestion()" class="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-2 rounded-xl shadow-md transition transform hover:scale-105 cursor-pointer">Siguiente Pregunta ➡️</button>
       </div>
     </section>
 
@@ -91,77 +94,21 @@
           <ul id="improvements-list" class="list-disc list-inside space-y-1 mt-1"></ul>
         </div>
       </div>
-      <button onclick="restartQuiz()" class="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold text-xl py-3 rounded-2xl shadow-lg transition transform hover:scale-105 cursor-pointer">
-        🔄 Jugar de Nuevo
-      </button>
+      <button onclick="restartQuiz()" class="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold text-xl py-3 rounded-2xl shadow-lg transition transform hover:scale-105 cursor-pointer">🔄 Jugar de Nuevo</button>
     </section>
   </main>
 
   <script>
     const questions = [
-      {
-        category: '1. Ordenar números de cuatro cifras',
-        question: '¡Los duendes mezclaron los tesoros! Ordena de MAYOR a MENOR estos números de cuatro cifras: 6753, 7563, 5673, 6573. ¿Cuál es el orden correcto?',
-        options: ['7563 > 6753 > 6573 > 5673', '5673 < 6573 < 6753 < 7563', '6753 > 7563 > 6573 > 5673'],
-        correctIndex: 0,
-        explanation: '¡Excelente! Comparando primero las unidades de millar, 7 es mayor que 6. Luego, entre 6753 y 6573, 6753 gana porque 7 centenas es mayor que 5.'
-      },
-      {
-        category: '2. Comparación de números de cuatro cifras',
-        question: 'Elige el signo correcto (>, <, =) para comparar: 4321 ______ 1234',
-        options: ['> (Mayor que)', '< (Menor que)', '= (Igual)'],
-        correctIndex: 0,
-        explanation: '¡Genial! 4321 tiene 4 unidades de millar, mientras que 1234 solo tiene 1.'
-      },
-      {
-        category: '3. Aproximación de sumas y restas',
-        question: 'Aproximando a las centenas sin resolver exactamente, ¿cuánto es aproximadamente 503 + 398?',
-        options: ['900', '800', '1000'],
-        correctIndex: 0,
-        explanation: '¡Perfecto! 503 se aproxima a 500 y 398 se aproxima a 400. 500 + 400 = 900.'
-      },
-      {
-        category: '4. Sumas con llevadas',
-        question: 'Resuelve: 478 + 265',
-        options: ['743', '833', '693'],
-        correctIndex: 0,
-        explanation: '¡Muy bien! 478 + 265 = 743.'
-      },
-      {
-        category: '5. Restas con llevadas',
-        question: 'Resuelve: 902 - 347',
-        options: ['555', '565', '575'],
-        correctIndex: 0,
-        explanation: '¡Correcto! 902 - 347 = 555.'
-      },
-      {
-        category: '6. Multiplicaciones sencillas',
-        question: '¿Cuánto es 9 × 7?',
-        options: ['56', '63', '72'],
-        correctIndex: 1,
-        explanation: '¡Exacto! 9 grupos de 7 son 63.'
-      },
-      {
-        category: '7. Divisiones básicas',
-        question: '¿Cuánto es 48 ÷ 6?',
-        options: ['6', '7', '8'],
-        correctIndex: 2,
-        explanation: '¡Perfecto! 6 × 8 = 48, así que 48 ÷ 6 = 8.'
-      },
-      {
-        category: '8. Geometría',
-        question: '¿Cuántos lados tiene un hexágono?',
-        options: ['5', '6', '7'],
-        correctIndex: 1,
-        explanation: '¡Buen trabajo! Un hexágono tiene 6 lados.'
-      },
-      {
-        category: '9. Problemas de lógica',
-        question: 'En una caja hay 12 lápices y se sacan 4. ¿Cuántos lápices quedan?',
-        options: ['6', '8', '10'],
-        correctIndex: 1,
-        explanation: '¡Muy bien! 12 - 4 = 8. Quedan 8 lápices.'
-      }
+      { category: '1. Ordenar números de cuatro cifras', question: '¡Los duendes mezclaron los tesoros! Ordena de MAYOR a MENOR estos números de cuatro cifras: 6753, 7563, 5673, 6573. ¿Cuál es el orden correcto?', options: ['7563 > 6753 > 6573 > 5673', '5673 < 6573 < 6753 < 7563', '6753 > 7563 > 6573 > 5673'], correctIndex: 0, explanation: '¡Excelente! Comparando primero las unidades de millar, 7 es mayor que 6. Luego, entre 6753 y 6573, 6753 gana porque 7 centenas es mayor que 5.' },
+      { category: '2. Comparación de números de cuatro cifras', question: 'Elige el signo correcto (>, <, =) para comparar: 4321 ______ 1234', options: ['> (Mayor que)', '< (Menor que)', '= (Igual)'], correctIndex: 0, explanation: '¡Genial! 4321 tiene 4 unidades de millar, mientras que 1234 solo tiene 1.' },
+      { category: '3. Aproximación de sumas y restas', question: 'Aproximando a las centenas sin resolver exactamente, ¿cuánto es aproximadamente 503 + 398?', options: ['900', '800', '1000'], correctIndex: 0, explanation: '¡Perfecto! 503 se aproxima a 500 y 398 se aproxima a 400. 500 + 400 = 900.' },
+      { category: '4. Sumas con llevadas', question: 'Resuelve: 478 + 265', options: ['743', '833', '693'], correctIndex: 0, explanation: '¡Muy bien! 478 + 265 = 743.' },
+      { category: '5. Restas con llevadas', question: 'Resuelve: 902 - 347', options: ['555', '565', '575'], correctIndex: 0, explanation: '¡Correcto! 902 - 347 = 555.' },
+      { category: '6. Multiplicaciones sencillas', question: '¿Cuánto es 9 × 7?', options: ['56', '63', '72'], correctIndex: 1, explanation: '¡Exacto! 9 grupos de 7 son 63.' },
+      { category: '7. Divisiones básicas', question: '¿Cuánto es 48 ÷ 6?', options: ['6', '7', '8'], correctIndex: 2, explanation: '¡Perfecto! 6 × 8 = 48, así que 48 ÷ 6 = 8.' },
+      { category: '8. Geometría', question: '¿Cuántos lados tiene un hexágono?', options: ['5', '6', '7'], correctIndex: 1, explanation: '¡Buen trabajo! Un hexágono tiene 6 lados.' },
+      { category: '9. Problemas de lógica', question: 'En una caja hay 12 lápices y se sacan 4. ¿Cuántos lápices quedan?', options: ['6', '8', '10'], correctIndex: 1, explanation: '¡Muy bien! 12 - 4 = 8. Quedan 8 lápices.' }
     ];
 
     const welcomeScreen = document.getElementById('welcome-screen');
@@ -172,7 +119,7 @@
     const questionText = document.getElementById('question-text');
     const optionsContainer = document.getElementById('options-container');
     const progressBar = document.getElementById('progress-bar');
-    const progressTrack = progressBar.parentElement;
+    const progressTrack = document.getElementById('progress-track');
     const feedbackContainer = document.getElementById('feedback-container');
     const feedbackTitle = document.getElementById('feedback-title');
     const feedbackText = document.getElementById('feedback-text');
@@ -181,6 +128,8 @@
     const strengthsList = document.getElementById('strengths-list');
     const improvementsList = document.getElementById('improvements-list');
     const soundToggle = document.getElementById('sound-toggle');
+    const confettiCanvas = document.getElementById('confetti-canvas');
+    const confettiContext = confettiCanvas.getContext('2d');
 
     let currentQuestionIndex = 0;
     let score = 0;
@@ -188,6 +137,7 @@
     let answeredCorrectly = [];
     let soundEnabled = true;
     let audioContext;
+    let confettiFrame = null;
 
     function playTone(frequency, startTime, duration, waveform = 'sine') {
       if (!soundEnabled) return;
@@ -208,7 +158,7 @@
         oscillator.start(startTime);
         oscillator.stop(startTime + duration + 0.02);
       } catch (error) {
-        // Audio is optional; the quiz remains fully usable if the browser blocks it.
+        // Audio is optional; the quiz remains usable if the browser blocks it.
       }
     }
 
@@ -226,9 +176,7 @@
           incorrect: [[320, 0, 0.18, 'triangle'], [250, 0.16, 0.22, 'triangle']],
           finish: [[523.25, 0, 0.12], [659.25, 0.12, 0.12], [783.99, 0.24, 0.12], [1046.5, 0.36, 0.32]]
         };
-        (notes[kind] || []).forEach(([frequency, offset, duration, waveform]) => {
-          playTone(frequency, now + offset, duration, waveform);
-        });
+        (notes[kind] || []).forEach(([frequency, offset, duration, waveform]) => playTone(frequency, now + offset, duration, waveform));
       } catch (error) {
         // Ignore unsupported or blocked audio.
       }
@@ -242,6 +190,70 @@
       if (soundEnabled) playSound('correct');
     }
 
+    function resizeConfettiCanvas() {
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      confettiCanvas.width = Math.floor(window.innerWidth * pixelRatio);
+      confettiCanvas.height = Math.floor(window.innerHeight * pixelRatio);
+      confettiContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    }
+
+    function stopConfetti() {
+      if (confettiFrame !== null) cancelAnimationFrame(confettiFrame);
+      confettiFrame = null;
+      confettiContext.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    }
+
+    function launchConfetti() {
+      stopConfetti();
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      resizeConfettiCanvas();
+      const colors = ['#f43f5e', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#ec4899'];
+      const particles = Array.from({ length: 150 }, () => ({
+        x: Math.random() * window.innerWidth,
+        y: -Math.random() * window.innerHeight * 0.7,
+        width: 5 + Math.random() * 7,
+        height: 8 + Math.random() * 9,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        speed: 2.5 + Math.random() * 4,
+        drift: (Math.random() - 0.5) * 2.5,
+        rotation: Math.random() * Math.PI * 2,
+        spin: (Math.random() - 0.5) * 0.12
+      }));
+      const startTime = performance.now();
+      const duration = 4200;
+
+      function animateConfetti(time) {
+        const elapsed = time - startTime;
+        confettiContext.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        const fade = Math.max(0, 1 - Math.max(0, elapsed - 3000) / 1200);
+        particles.forEach((particle) => {
+          particle.x += particle.drift;
+          particle.y += particle.speed;
+          particle.rotation += particle.spin;
+          if (particle.y > window.innerHeight + 20) {
+            particle.y = -20;
+            particle.x = Math.random() * window.innerWidth;
+          }
+          confettiContext.save();
+          confettiContext.globalAlpha = fade;
+          confettiContext.translate(particle.x, particle.y);
+          confettiContext.rotate(particle.rotation);
+          confettiContext.fillStyle = particle.color;
+          confettiContext.fillRect(-particle.width / 2, -particle.height / 2, particle.width, particle.height);
+          confettiContext.restore();
+        });
+        if (elapsed < duration) {
+          confettiFrame = requestAnimationFrame(animateConfetti);
+        } else {
+          stopConfetti();
+        }
+      }
+      confettiFrame = requestAnimationFrame(animateConfetti);
+    }
+
+    window.addEventListener('resize', resizeConfettiCanvas);
+    resizeConfettiCanvas();
+
     function showScreen(screen) {
       welcomeScreen.classList.add('hidden');
       quizScreen.classList.add('hidden');
@@ -250,6 +262,7 @@
     }
 
     function startQuiz() {
+      stopConfetti();
       currentQuestionIndex = 0;
       score = 0;
       answeredCorrectly = [];
@@ -264,14 +277,12 @@
       questionCategory.textContent = current.category;
       questionCounter.textContent = `Pregunta ${currentQuestionIndex + 1} de ${questions.length}`;
       questionText.textContent = current.question;
-      const progress = (currentQuestionIndex / questions.length) * 100;
-      progressBar.style.width = `${progress}%`;
+      progressBar.style.width = `${(currentQuestionIndex / questions.length) * 100}%`;
       progressTrack.setAttribute('aria-valuenow', String(currentQuestionIndex));
       optionsContainer.replaceChildren();
       feedbackContainer.classList.add('hidden');
       feedbackContainer.classList.remove('bg-gray-50', 'border-2', 'border-gray-200');
       answered = false;
-
       current.options.forEach((option, index) => {
         const button = document.createElement('button');
         button.type = 'button';
@@ -292,7 +303,6 @@
         if (index === current.correctIndex) button.classList.add('correct');
         if (index === selectedIndex && index !== current.correctIndex) button.classList.add('wrong');
       });
-
       const isCorrect = selectedIndex === current.correctIndex;
       answeredCorrectly[currentQuestionIndex] = isCorrect;
       if (isCorrect) {
@@ -307,7 +317,6 @@
         feedbackTitle.classList.remove('text-green-600');
         playSound('incorrect');
       }
-
       feedbackText.textContent = current.explanation;
       feedbackContainer.classList.remove('hidden');
       feedbackContainer.classList.add('bg-gray-50', 'border-2', 'border-gray-200');
@@ -324,19 +333,14 @@
 
     function showResults() {
       showScreen(resultScreen);
+      launchConfetti();
       playSound('finish');
       const percentage = Math.round((score / questions.length) * 100);
       finalScore.textContent = `${score} / ${questions.length}`;
-
-      if (percentage >= 80) {
-        encouragementMsg.textContent = '¡Increíble! Eres un auténtico campeón de las matemáticas.';
-      } else if (percentage >= 60) {
-        encouragementMsg.textContent = '¡Muy bien! Ya vas por buen camino, sigue practicando.';
-      } else if (percentage >= 40) {
-        encouragementMsg.textContent = '¡Buen esfuerzo! Cada intento te ayuda a mejorar.';
-      } else {
-        encouragementMsg.textContent = '¡Sigue intentándolo! Las matemáticas se vuelven más fáciles con práctica.';
-      }
+      if (percentage >= 80) encouragementMsg.textContent = '¡Increíble! Eres un auténtico campeón de las matemáticas.';
+      else if (percentage >= 60) encouragementMsg.textContent = '¡Muy bien! Ya vas por buen camino, sigue practicando.';
+      else if (percentage >= 40) encouragementMsg.textContent = '¡Buen esfuerzo! Cada intento te ayuda a mejorar.';
+      else encouragementMsg.textContent = '¡Sigue intentándolo! Las matemáticas se vuelven más fáciles con práctica.';
 
       strengthsList.replaceChildren();
       improvementsList.replaceChildren();
@@ -358,6 +362,7 @@
     }
 
     function restartQuiz() {
+      stopConfetti();
       currentQuestionIndex = 0;
       score = 0;
       answered = false;
