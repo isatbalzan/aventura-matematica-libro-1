@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡La Aventura Matemática de EMAT! 🚀</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Fredoka', cursive, sans-serif; }
+        .bounce-custom { animation: bounce 2s infinite; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(-5%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
+            50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 min-h-screen flex items-center justify-center p-4">
+
+    <div id="app" class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-6 md:p-10 border-8 border-yellow-300 relative overflow-hidden">
+        
+        <!-- Decoración infantil -->
+        <div class="absolute -top-6 -right-6 text-6xl opacity-20">⭐</div>
+        <div class="absolute -bottom-6 -left-6 text-6xl opacity-20">🎈</div>
+
+        <!-- Pantalla de Inicio -->
+        <div id="welcome-screen" class="text-center space-y-6">
+            <div class="inline-block bg-yellow-400 text-yellow-900 px-6 py-2 rounded-full font-bold text-lg shadow-md uppercase tracking-wider">
+                ¡Editorial ANAYA • EMAT 3.º Primaria! 🎒
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-purple-700 leading-tight">
+                ¡La Gran Aventura de las Matemáticas! 🦁⛵
+            </h1>
+            <p class="text-gray-600 text-lg">
+                Prepárate para superar este súper reto con piratas, cohetes y muchos números. ¡Demuestra todo lo que sabes!
+            </p>
+            <div class="flex justify-center items-center space-x-4 py-4">
+                <span class="text-5xl bounce-custom">🐢</span>
+                <span class="text-5xl bounce-custom" style="animation-delay: 0.2s;">🚀</span>
+                <span class="text-5xl bounce-custom" style="animation-delay: 0.4s;">🧩</span>
+            </div>
+            <button onclick="startQuiz()" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white font-bold text-2xl py-4 rounded-2xl shadow-lg transform transition hover:scale-105 active:scale-95">
+                ¡Comenzar el Reto! 🎮
+            </button>
+        </div>
+
+        <!-- Pantalla de Pregunta -->
+        <div id="quiz-screen" class="hidden space-y-6">
+            <div class="flex justify-between items-center bg-purple-100 px-4 py-2 rounded-xl">
+                <span id="question-category" class="font-bold text-purple-700 text-sm md:text-base">Materia</span>
+                <span id="question-counter" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-sm font-bold">Pregunta 1 de 9</span>
+            </div>
+
+            <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
+                <div id="progress-bar" class="bg-yellow-400 h-full transition-all duration-300" style="width: 11.1%;"></div>
+            </div>
+
+            <div class="bg-yellow-50 border-4 border-yellow-200 p-6 rounded-2xl text-center">
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800">Texto de la pregunta...</h2>
+            </div>
+
+            <div id="options-container" class="grid grid-cols-1 gap-3">
+                <!-- Opciones dinámicas -->
+            </div>
+
+            <div id="feedback-container" class="hidden p-4 rounded-2xl text-center transition-all">
+                <p id="feedback-title" class="font-bold text-lg mb-1"></p>
+                <p id="feedback-text" class="text-sm md:text-base"></p>
+                <button id="next-btn" onclick="nextQuestion()" class="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-2 rounded-xl shadow-md transition transform hover:scale-105">
+                    Siguiente Pregunta ➡️
+                </button>
+            </div>
+        </div>
+
+        <!-- Pantalla Final (Resultados y Nota) -->
+        <div id="result-screen" class="hidden text-center space-y-6">
+            <div class="text-6xl mb-2">🏆</div>
+            <h2 class="text-3xl md:text-4xl font-bold text-purple-700">¡Reto Completado con Éxito!</h2>
+            
+            <div class="inline-block bg-yellow-100 border-4 border-yellow-400 rounded-3xl p-6 shadow-inner w-full">
+                <p class="text-gray-600 font-semibold text-lg">Tu Nota Final:</p>
+                <p id="final-score" class="text-5xl md:text-6xl font-extrabold text-purple-600 my-2">8.5 / 10</p>
+                <p id="encouragement-msg" class="text-gray-700 font-medium"></p>
+            </div>
+
+            <div class="bg-blue-50 border-2 border-blue-200 p-4 rounded-2xl text-left space-y-3">
+                <h3 class="font-bold text-blue-800 text-lg">💡 Informe para el campeón:</h3>
+                <div id="strengths-box" class="text-sm text-gray-700">
+                    <p class="font-semibold text-green-700">✅ Lo que has hecho genial:</p>
+                    <ul id="strengths-list" class="list-disc list-inside space-y-1 mt-1"></ul>
+                </div>
+                <div id="improvements-box" class="text-sm text-gray-700 pt-2 border-t border-blue-200">
+                    <p class="font-semibold text-orange-700">🎯 Lo que podemos practicar un poquito más:</p>
+                    <ul id="improvements-list" class="list-disc list-inside space-y-1 mt-1"></ul>
+                </div>
+            </div>
+
+            <button onclick="restartQuiz()" class="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold text-xl py-3 rounded-2xl shadow-lg transition transform hover:scale-105">
+                🔄 Jugar de Nuevo
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const questions = [
+            {
+                category: "1. Ordenar números de cuatro cifras",
+                question: "¡Los duendes mezclaron los tesoros! Ordena de MAYOR a MENOR estos números de cuatro cifras: $6753$, $7563$, $5673$, $6573$. ¿Cuál es el orden correcto?",
+                options: [
+                    { text: "$7563 > 6753 > 6573 > 5673$", correct: true, explanation: "¡Excelente! Comparamos primero las unidades de millar ($7$ es mayor que $6$, y entre los $6$ mil, $750$ es mayor que $573$)." },
+                    { text: "$5673 < 6573 < 6753 < 7563$", correct: false, explanation: "Cuidado, esto es de menor a mayor. Nos pedían de mayor a menor." },
+                    { text: "$6753 > 7563 > 6573 > 5673$", correct: false, explanation: "Fíjate bien en los miles: $7563$ es más grande que $6753$." }
+                ]
+            },
+            {
+                category: "2. Comparación de números de cuatro cifras",
+                question: "Elige el signo correcto $(>, <, =)$ para comparar: $4321$ ______ $1234$",
+                options: [
+                    { text: "$>$ (Mayor que)", correct: true, explanation: "¡Genial! $4321$ tiene $4$ unidades de millar, mientras que $1234$ solo tiene $1$." },
+                    { text: "$<$ (Menor que)", correct: false, explanation: "¡Cuidado! El número de la izquierda ($4321$) es mucho mayor." },
+                    { text: "$=$ (Igual)", correct: false, explanation: "No son iguales, tienen cifras totalmente diferentes." }
+                ]
+            },
+            {
+                category: "3. Aproximación de sumas y restas",
+                question: "Aproximando a las centenas sin resolver exactamente, ¿cuánto es aproximadamente $503 + 398$?",
+                options: [
+                    { text: "$900$", correct: true, explanation: "¡Perfecto! $503$ se aproxima a $500$ y $398$ se aproxima a $400$. Sumando $500 + 400 = 900$." },
+                    { text: "$800$", correct: false, explanation: "¡Casi! Recuerda que $398$ está muy cerca de $400$." },
+                    { text: "$1000$", correct: false, explanation: "Te has pasado un poquito al sumar las aproximaciones." }
+                ]
+            },
+            {
+                category: "4. Problemas con la multiplicación",
+                question: "En el circo, cada payaso hace malabares con $6$ pelotas y hay $5$ payasos en escena. ¿Cuántas pelotas hay en total?",
+                options: [
+                    { text: "$30$ pelotas", correct: true, explanation: "¡Fantástico! Multiplicamos $5 \\text{ payasos} \\times 6 \\text{ pelotas} = 30$ pelotas en total." },
+                    { text: "$11$ pelotas", correct: false, explanation: "¡Cuidado! En los problemas de grupos iguales se multiplica, no se suma ($5 + 6$). " },
+                    { text: "$25$ pelotas", correct: false, explanation: "Revisa la tabla del $5$ o del $6$: $5 \\times 6 = 30$." }
+                ]
+            },
+            {
+                category: "5. Compruebo igualdades y desigualdades",
+                question: "Observa la operación y descubre el número que falta: $85 + 10 = \\dots + 15$",
+                options: [
+                    { text: "$80$", correct: true, explanation: "¡Increíble! A la izquierda tenemos $85 + 10 = 95$. Para que a la derecha dé $95$ teniendo ya $15$, necesitamos $80$ ($80 + 15 = 95$)." },
+                    { text: "$85$", correct: false, explanation: "Si pones $85$, la suma de la derecha daría $100$, y a la izquierda tenemos $95$." },
+                    { text: "$90$", correct: false, explanation: "¡Prueba de nuevo haciendo la cuenta en ambos lados!" }
+                ]
+            },
+            {
+                category: "6. Elementos de la circunferencia y el círculo",
+                question: "En una circunferencia o círculo, ¿cómo se llama la línea recta que va desde el centro exacto hasta cualquier punto de su borde?",
+                options: [
+                    { text: "El radio", correct: true, explanation: "¡Muy bien! El radio es el segmento que une el centro con la línea curva exterior." },
+                    { text: "El diámetro", correct: false, explanation: "El diámetro atraviesa toda la circunferencia pasando por el centro (mide el doble que el radio)." },
+                    { text: "La esquina", correct: false, explanation: "Las circunferencias y círculos son redondos y no tienen esquinas." }
+                ]
+            },
+            {
+                category: "7. Cálculo de áreas",
+                question: "Si una figura geométrica está dibujada en una cuadrícula y ocupa exactamente $14$ cuadraditos de $1 \\text{ cm}^2$ cada uno, ¿cuál es su área?",
+                options: [
+                    { text: "$14 \\text{ cm}^2$", correct: true, explanation: "¡Exacto! El área en cuadrículas se calcula contando cuántas unidades cuadradas cubre la figura." },
+                    { text: "$28 \\text{ cm}^2$", correct: false, explanation: "No hace falta multiplicar por dos, cada cuadradito representa $1 \\text{ cm}^2$." },
+                    { text: "$7 \\text{ cm}^2$", correct: false, explanation: "Has dividido entre dos por error; el total de cuadraditos es $14$." }
+                ]
+            },
+            {
+                category: "8. Redondeo a la centena más cercana",
+                question: "Redondea el número $487$ a la CENTENA más cercana.",
+                options: [
+                    { text: "$500$", correct: true, explanation: "¡Excelente! Como la decena es $8$ (es mayor o igual que $5$), redondeamos la centena hacia arriba ($400$ pasa a $500$)." },
+                    { text: "$400$", correct: false, explanation: "Cuidado, el $87$ está mucho más cerca de $500$ que de $400$." },
+                    { text: "$490$", correct: false, explanation: "Eso sería redondear a la decena, no a la centena." }
+                ]
+            },
+            {
+                category: "9. Números ordinales",
+                question: "En el colegio han organizado un concurso y te toca participar en el puesto número $15.°$. ¿Cómo se lee este número ordinal?",
+                options: [
+                    { text: "Decimoquinto", correct: true, explanation: "¡Genial! El número ordinal $15.°$ se lee decimoquinto." },
+                    { text: "Décimo", correct: false, explanation: "Décimo corresponde al número $10.°$." },
+                    { text: "Vigésimo quinto", correct: false, explanation: "Vigésimo quinto correspondería al número $25.°$." }
+                ]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = [];
+
+        function startQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            document.getElementById('welcome-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-category').innerText = q.category;
+            document.getElementById('question-counter').innerText = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('question-text').innerHTML = q.question;
+            
+            const progressPercent = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = progressPercent + '%';
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            document.getElementById('feedback-container').classList.add('hidden');
+
+            // Mezclar opciones aleatoriamente
+            let shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-2xl border-2 border-purple-200 bg-purple-50 hover:bg-purple-100 font-semibold text-purple-900 transition text-lg shadow-sm";
+                btn.innerHTML = opt.text;
+                btn.onclick = () => selectOption(opt, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectOption(selectedOpt, btnElement) {
+            // Deshabilitar todos los botones
+            const buttons = document.getElementById('options-container').getElementsByTagName('button');
+            for (let b of buttons) {
+                b.disabled = true;
+                if (b.innerText === selectedOpt.text && selectedOpt.correct) {
+                    b.classList.remove('bg-purple-50', 'border-purple-200');
+                    b.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+                }
+            }
+
+            if (selectedOpt.correct) {
+                score++;
+                btnElement.classList.remove('bg-purple-50', 'border-purple-200');
+                btnElement.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+                showFeedback(true, selectedOpt.explanation);
+            } else {
+                btnElement.classList.remove('bg-purple-50', 'border-purple-200');
+                btnElement.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
+                showFeedback(false, selectedOpt.explanation);
+            }
+
+            userAnswers.push({
+                question: questions[currentQuestion].category,
+                correct: selectedOpt.correct
+            });
+        }
+
+        function showFeedback(isCorrect, explanation) {
+            const feedbackContainer = document.getElementById('feedback-container');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackText = document.getElementById('feedback-text');
+
+            feedbackContainer.classList.remove('hidden');
+            if (isCorrect) {
+                feedbackContainer.className = "p-4 rounded-2xl text-center bg-green-50 border-2 border-green-300";
+                feedbackTitle.innerHTML = "🎉 ¡EXCELENTE! ¡Respuesta Correcta!";
+                feedbackTitle.className = "font-bold text-lg text-green-700 mb-1";
+            } else {
+                feedbackContainer.className = "p-4 rounded-2xl text-center bg-orange-50 border-2 border-orange-300";
+                feedbackTitle.innerHTML = "💡 ¡Casi! Vamos a aprender por qué:";
+                feedbackTitle.className = "font-bold text-lg text-orange-700 mb-1";
+            }
+            feedbackText.innerHTML = explanation;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            // Calcular nota sobre 10
+            let grade = (score / questions.length) * 10;
+            document.getElementById('final-score').innerText = grade.toFixed(1) + " / 10";
+
+            let msg = "";
+            if (grade >= 9) {
+                msg = "🌟 ¡Impresionante! ¡Eres un genio total de las matemáticas de EMAT!";
+            } else if (grade >= 7) {
+                msg = "👏 ¡Muy buen trabajo! Tienes súper claros la mayoría de los conceptos.";
+            } else if (grade >= 5) {
+                msg = "👍 ¡Aprobado! Has hecho un gran esfuerzo, ¡sigue practicando!";
+            } else {
+                msg = "💪 ¡No te preocupes! Con un poco más de práctica en el libro Anaya lo conseguirás.";
+            }
+            document.getElementById('encouragement-msg').innerText = msg;
+
+            // Generar fortalezas y áreas de mejora
+            const strengthsList = document.getElementById('strengths-list');
+            const improvementsList = document.getElementById('improvements-list');
+            strengthsList.innerHTML = '';
+            improvementsList.innerHTML = '';
+
+            let correctCategories = userAnswers.filter(a => a.correct).map(a => a.question);
+            let incorrectCategories = userAnswers.filter(a => !a.correct).map(a => a.question);
+
+            if (correctCategories.length > 0) {
+                correctCategories.forEach(cat => {
+                    let li = document.createElement('li');
+                    li.innerText = cat;
+                    strengthsList.appendChild(li);
+                });
+            } else {
+                let li = document.createElement('li');
+                li.innerText = "¡Has puesto mucha atención e ilusión en terminar el reto!";
+                strengthsList.appendChild(li);
+            }
+
+            if (incorrectCategories.length > 0) {
+                incorrectCategories.forEach(cat => {
+                    let li = document.createElement('li');
+                    li.innerText = cat;
+                    improvementsList.appendChild(li);
+                });
+            } else {
+                let li = document.createElement('li');
+                li.innerText = "¡Ninguna! ¡Has respondido todo perfectamente bien!";
+                improvementsList.appendChild(li);
+            }
+        }
+
+        function restartQuiz() {
+            startQuiz();
+        }
+    </script>
+</body>
+</html>
+```eof
+
+### Resumen del Quiz Generado:
+- **Temática infantil y divertida:** Diseñado con colores vivos, iconos animados, y un tono muy motivador (estilo EMAT Anaya).
+- **Cobertura total del examen:** Incluye preguntas sobre ordenación de números de 4 cifras, comparación ($>$, $<$, $=$), aproximación de sumas y restas, problemas de multiplicación, igualdades y desigualdades, elementos de la circunferencia y el círculo, cálculo de áreas, redondeo a la centena y números ordinales.
+- **Feedback inmediato:** Cada pregunta muestra instantáneamente si ha acertado o fallado, acompañado de una explicación pedagógica clara.
+- **Pantalla final interactiva:** Calcula la **nota sobre 10**, felicita al alumno y desglosa detalladamente lo que ha hecho bien y los temas específicos que debe repasar.
+
+¡Mucho éxito en el examen de matemáticas! 🌟
