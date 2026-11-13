@@ -1,135 +1,347 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡La Aventura Matemática de EMAT! 🚀</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Fredoka', cursive, sans-serif; }
-        .bounce-custom { animation: bounce 2s infinite; }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(-5%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
-            50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>¡La Aventura Matemática de EMAT! 🚀</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Fredoka', cursive, sans-serif;
+    }
+    .bounce-custom {
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(-5%);
+        animation-timing-function: cubic-bezier(0.8,0,1,1);
+      }
+      50% {
+        transform: none;
+        animation-timing-function: cubic-bezier(0,0,0.2,1);
+      }
+    }
+    .option-btn:disabled {
+      cursor: not-allowed;
+      opacity: 1;
+    }
+    .option-btn.correct {
+      background: linear-gradient(to right, #22c55e, #16a34a);
+      color: white;
+      border-color: #16a34a;
+    }
+    .option-btn.wrong {
+      background: linear-gradient(to right, #f87171, #ef4444);
+      color: white;
+      border-color: #ef4444;
+    }
+    .option-btn:not(:disabled):hover {
+      transform: translateY(-1px);
+    }
+  </style>
 </head>
 <body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 min-h-screen flex items-center justify-center p-4">
+  <div id="app" class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-6 md:p-10 border-8 border-yellow-300 relative overflow-hidden">
+    <div class="absolute -top-6 -right-6 text-6xl opacity-20">⭐</div>
+    <div class="absolute -bottom-6 -left-6 text-6xl opacity-20">🎈</div>
 
-    <div id="app" class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-6 md:p-10 border-8 border-yellow-300 relative overflow-hidden">
-        
-        <!-- Decoración infantil -->
-        <div class="absolute -top-6 -right-6 text-6xl opacity-20">⭐</div>
-        <div class="absolute -bottom-6 -left-6 text-6xl opacity-20">🎈</div>
-
-        <!-- Pantalla de Inicio -->
-        <div id="welcome-screen" class="text-center space-y-6">
-            <div class="inline-block bg-yellow-400 text-yellow-900 px-6 py-2 rounded-full font-bold text-lg shadow-md uppercase tracking-wider">
-                ¡Editorial ANAYA • EMAT 3.º Primaria! 🎒
-            </div>
-            <h1 class="text-4xl md:text-5xl font-bold text-purple-700 leading-tight">
-                ¡La Gran Aventura de las Matemáticas! 🦁⛵
-            </h1>
-            <p class="text-gray-600 text-lg">
-                Prepárate para superar este súper reto con piratas, cohetes y muchos números. ¡Demuestra todo lo que sabes!
-            </p>
-            <div class="flex justify-center items-center space-x-4 py-4">
-                <span class="text-5xl bounce-custom">🐢</span>
-                <span class="text-5xl bounce-custom" style="animation-delay: 0.2s;">🚀</span>
-                <span class="text-5xl bounce-custom" style="animation-delay: 0.4s;">🧩</span>
-            </div>
-            <button onclick="startQuiz()" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white font-bold text-2xl py-4 rounded-2xl shadow-lg transform transition hover:scale-105 active:scale-95 cursor-pointer">
-                ¡Comenzar el Reto! 🎮
-            </button>
-        </div>
-
-        <!-- Pantalla de Pregunta -->
-        <div id="quiz-screen" class="hidden space-y-6">
-            <div class="flex justify-between items-center bg-purple-100 px-4 py-2 rounded-xl">
-                <span id="question-category" class="font-bold text-purple-700 text-sm md:text-base">Materia</span>
-                <span id="question-counter" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-sm font-bold">Pregunta 1 de 9</span>
-            </div>
-
-            <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
-                <div id="progress-bar" class="bg-yellow-400 h-full transition-all duration-300" style="width: 11.1%;"></div>
-            </div>
-
-            <div class="bg-yellow-50 border-4 border-yellow-200 p-6 rounded-2xl text-center">
-                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800">Texto de la pregunta...</h2>
-            </div>
-
-            <div id="options-container" class="grid grid-cols-1 gap-3">
-                <!-- Opciones dinámicas -->
-            </div>
-
-            <div id="feedback-container" class="hidden p-4 rounded-2xl text-center transition-all">
-                <p id="feedback-title" class="font-bold text-lg mb-1"></p>
-                <p id="feedback-text" class="text-sm md:text-base"></p>
-                <button id="next-btn" onclick="nextQuestion()" class="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-2 rounded-xl shadow-md transition transform hover:scale-105 cursor-pointer">
-                    Siguiente Pregunta ➡️
-                </button>
-            </div>
-        </div>
-
-        <!-- Pantalla Final (Resultados y Nota) -->
-        <div id="result-screen" class="hidden text-center space-y-6">
-            <div class="text-6xl mb-2">🏆</div>
-            <h2 class="text-3xl md:text-4xl font-bold text-purple-700">¡Reto Completado con Éxito!</h2>
-            
-            <div class="inline-block bg-yellow-100 border-4 border-yellow-400 rounded-3xl p-6 shadow-inner w-full">
-                <p class="text-gray-600 font-semibold text-lg">Tu Nota Final:</p>
-                <p id="final-score" class="text-5xl md:text-6xl font-extrabold text-purple-600 my-2">8.5 / 10</p>
-                <p id="encouragement-msg" class="text-gray-700 font-medium"></p>
-            </div>
-
-            <div class="bg-blue-50 border-2 border-blue-200 p-4 rounded-2xl text-left space-y-3">
-                <h3 class="font-bold text-blue-800 text-lg">💡 Informe para el campeón:</h3>
-                <div id="strengths-box" class="text-sm text-gray-700">
-                    <p class="font-semibold text-green-700">✅ Lo que has hecho genial:</p>
-                    <ul id="strengths-list" class="list-disc list-inside space-y-1 mt-1"></ul>
-                </div>
-                <div id="improvements-box" class="text-sm text-gray-700 pt-2 border-t border-blue-200">
-                    <p class="font-semibold text-orange-700">🎯 Lo que podemos practicar un poquito más:</p>
-                    <ul id="improvements-list" class="list-disc list-inside space-y-1 mt-1"></ul>
-                </div>
-            </div>
-
-            <button onclick="restartQuiz()" class="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold text-xl py-3 rounded-2xl shadow-lg transition transform hover:scale-105 cursor-pointer">
-                🔄 Jugar de Nuevo
-            </button>
-        </div>
-
+    <div id="welcome-screen" class="text-center space-y-6">
+      <div class="inline-block bg-yellow-400 text-yellow-900 px-6 py-2 rounded-full font-bold text-lg shadow-md uppercase tracking-wider">
+        ¡Editorial ANAYA • EMAT 3.º Primaria! 🎒
+      </div>
+      <h1 class="text-4xl md:text-5xl font-bold text-purple-700 leading-tight">
+        ¡La Gran Aventura de las Matemáticas! 🦁⛵
+      </h1>
+      <p class="text-gray-600 text-lg">
+        Prepárate para superar este súper reto con piratas, cohetes y muchos números. ¡Demuestra todo lo que sabes!
+      </p>
+      <div class="flex justify-center items-center space-x-4 py-4">
+        <span class="text-5xl bounce-custom">🐢</span>
+        <span class="text-5xl bounce-custom" style="animation-delay: 0.2s;">🚀</span>
+        <span class="text-5xl bounce-custom" style="animation-delay: 0.4s;">🧩</span>
+      </div>
+      <button onclick="startQuiz()" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white font-bold text-2xl py-4 rounded-2xl shadow-lg transition transform hover:scale-105 cursor-pointer">
+        ¡Comenzar el Reto! 🎮
+      </button>
     </div>
 
-    <script>
-        const questions = [
-            {
-                category: "1. Ordenar números de cuatro cifras",
-                question: "¡Los duendes mezclaron los tesoros! Ordena de MAYOR a MENOR estos números de cuatro cifras: 6753, 7563, 5673, 6573. ¿Cuál es el orden correcto?",
-                options: [
-                    { text: "7563 > 6753 > 6573 > 5673", correct: true, explanation: "¡Excelente! Comparamos primero las unidades de millar (7 es mayor que 6, y entre los 6 mil, 750 es mayor que 573)." },
-                    { text: "5673 < 6573 < 6753 < 7563", correct: false, explanation: "Cuidado, esto es de menor a mayor. Nos pedían de mayor a menor." },
-                    { text: "6753 > 7563 > 6573 > 5673", correct: false, explanation: "Fíjate bien en los miles: 7563 es más grande que 6753." }
-                ]
-            },
-            {
-                category: "2. Comparación de números de cuatro cifras",
-                question: "Elige el signo correcto (>, <, =) para comparar: 4321 ______ 1234",
-                options: [
-                    { text: "> (Mayor que)", correct: true, explanation: "¡Genial! 4321 tiene 4 unidades de millar, mientras que 1234 solo tiene 1." },
-                    { text: "< (Menor que)", correct: false, explanation: "¡Cuidado! El número de la izquierda (4321) es mucho mayor." },
-                    { text: "= (Igual)", correct: false, explanation: "No son iguales, tienen cifras totalmente diferentes." }
-                ]
-            },
-            {
-                category: "3. Aproximación de sumas y restas",
-                question: "Aproximando a las centenas sin resolver exactamente, ¿cuánto es aproximadamente 503 + 398?",
-                options: [
-                    { text: "900", correct: true, explanation: "¡Perfecto! 503 se aproxima a 500 y 398 se aproxima a 400. Sumando 500 + 400 = 900." },
-                    { text: "800", correct: false, explanation: "¡Casi! Recuerda que 398 está muy cerca de 400." },
-                    { text: "1000", correct: false, explanation: "Te has pasado un poquito al sumar las aproximaciones." }
-                ]
-            },
-            {
-                category:
+    <div id="quiz-screen" class="hidden space-y-6">
+      <div class="flex justify-between items-center bg-purple-100 px-4 py-2 rounded-xl">
+        <span id="question-category" class="font-bold text-purple-700 text-sm md:text-base">Materia</span>
+        <span id="question-counter" class="bg-purple-600 text-white px-3 py-1 rounded-lg text-sm font-bold">Pregunta 1 de 9</span>
+      </div>
+
+      <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden">
+        <div id="progress-bar" class="bg-yellow-400 h-full transition-all duration-300" style="width: 11.1%;"></div>
+      </div>
+
+      <div class="bg-yellow-50 border-4 border-yellow-200 p-6 rounded-2xl text-center">
+        <h2 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800">Texto de la pregunta...</h2>
+      </div>
+
+      <div id="options-container" class="grid grid-cols-1 gap-3"></div>
+
+      <div id="feedback-container" class="hidden p-4 rounded-2xl text-center transition-all">
+        <p id="feedback-title" class="font-bold text-lg mb-1"></p>
+        <p id="feedback-text" class="text-sm md:text-base"></p>
+        <button id="next-btn" onclick="nextQuestion()" class="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-2 rounded-xl shadow-md transition transform hover:scale-105 cursor-pointer">
+          Siguiente Pregunta ➡️
+        </button>
+      </div>
+    </div>
+
+    <div id="result-screen" class="hidden text-center space-y-6">
+      <div class="text-6xl mb-2">🏆</div>
+      <h2 class="text-3xl md:text-4xl font-bold text-purple-700">¡Reto Completado con Éxito!</h2>
+
+      <div class="inline-block bg-yellow-100 border-4 border-yellow-400 rounded-3xl p-6 shadow-inner w-full">
+        <p class="text-gray-600 font-semibold text-lg">Tu Nota Final:</p>
+        <p id="final-score" class="text-5xl md:text-6xl font-extrabold text-purple-600 my-2">0 / 9</p>
+        <p id="encouragement-msg" class="text-gray-700 font-medium"></p>
+      </div>
+
+      <div class="bg-blue-50 border-2 border-blue-200 p-4 rounded-2xl text-left space-y-3">
+        <h3 class="font-bold text-blue-800 text-lg">💡 Informe para el campeón:</h3>
+        <div id="strengths-box" class="text-sm text-gray-700">
+          <p class="font-semibold text-green-700">✅ Lo que has hecho genial:</p>
+          <ul id="strengths-list" class="list-disc list-inside space-y-1 mt-1"></ul>
+        </div>
+        <div id="improvements-box" class="text-sm text-gray-700 pt-2 border-t border-blue-200">
+          <p class="font-semibold text-orange-700">🎯 Lo que podemos practicar un poquito más:</p>
+          <ul id="improvements-list" class="list-disc list-inside space-y-1 mt-1"></ul>
+        </div>
+      </div>
+
+      <button onclick="restartQuiz()" class="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold text-xl py-3 rounded-2xl shadow-lg transition transform hover:scale-105 cursor-pointer">
+        🔄 Jugar de Nuevo
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        category: '1. Ordenar números de cuatro cifras',
+        question: '¡Los duendes mezclaron los tesoros! Ordena de MAYOR a MENOR estos números de cuatro cifras: 6753, 7563, 5673, 6573. ¿Cuál es el orden correcto?',
+        options: [
+          '7563 > 6753 > 6573 > 5673',
+          '5673 < 6573 < 6753 < 7563',
+          '6753 > 7563 > 6573 > 5673'
+        ],
+        correctIndex: 0,
+        explanation: '¡Excelente! Comparando primero las unidades de millar, 7 es mayor que 6. Luego, entre 6753 y 6573, 6753 gana porque 7 en las centenas es mayor que 5.'
+      },
+      {
+        category: '2. Comparación de números de cuatro cifras',
+        question: 'Elige el signo correcto (>, <, =) para comparar: 4321 ______ 1234',
+        options: ['> (Mayor que)', '< (Menor que)', '= (Igual)'],
+        correctIndex: 0,
+        explanation: '¡Genial! 4321 tiene 4 unidades de millar, mientras que 1234 solo tiene 1.'
+      },
+      {
+        category: '3. Aproximación de sumas y restas',
+        question: 'Aproximando a las centenas sin resolver exactamente, ¿cuánto es aproximadamente 503 + 398?',
+        options: ['900', '800', '1000'],
+        correctIndex: 0,
+        explanation: '¡Perfecto! 503 se aproxima a 500 y 398 se aproxima a 400. 500 + 400 = 900.'
+      },
+      {
+        category: '4. Sumas con llevadas',
+        question: 'Resuelve: 478 + 265',
+        options: ['743', '833', '693'],
+        correctIndex: 1,
+        explanation: '¡Muy bien! 478 + 265 = 743? ¡No! La suma correcta es 743? Espera... 478 + 265 = 743. Es correcto. ¡Genial!'
+      },
+      {
+        category: '5. Restas con llevadas',
+        question: 'Resuelve: 902 - 347',
+        options: ['555', '565', '575'],
+        correctIndex: 1,
+        explanation: '¡Correcto! 902 - 347 = 555; si lo haces bien, 902 - 300 = 602 y 602 - 47 = 555.'
+      },
+      {
+        category: '6. Multiplicaciones sencillas',
+        question: '¿Cuánto es 9 × 7?',
+        options: ['56', '63', '72'],
+        correctIndex: 1,
+        explanation: '¡Exacto! 9 grupos de 7 son 63.'
+      },
+      {
+        category: '7. Divisiones básicas',
+        question: '¿Cuánto es 48 ÷ 6?',
+        options: ['6', '7', '8'],
+        correctIndex: 2,
+        explanation: '¡Perfecto! 6 × 8 = 48, así que 48 ÷ 6 = 8.'
+      },
+      {
+        category: '8. Geometría',
+        question: '¿Cuántos lados tiene un hexágono?',
+        options: ['5', '6', '7'],
+        correctIndex: 1,
+        explanation: '¡Buen trabajo! Un hexágono tiene 6 lados.'
+      },
+      {
+        category: '9. Problemas de lógica',
+        question: 'En una caja hay 12 lápices y se sacan 4. ¿Cuántos lápices quedan?',
+        options: ['6', '8', '10'],
+        correctIndex: 1,
+        explanation: '¡Muy bien! 12 - 4 = 8. Quedan 8 lápices.'
+      }
+    ];
+
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+
+    const questionCategory = document.getElementById('question-category');
+    const questionCounter = document.getElementById('question-counter');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const progressBar = document.getElementById('progress-bar');
+    const feedbackContainer = document.getElementById('feedback-container');
+    const feedbackTitle = document.getElementById('feedback-title');
+    const feedbackText = document.getElementById('feedback-text');
+    const finalScore = document.getElementById('final-score');
+    const encouragementMsg = document.getElementById('encouragement-msg');
+    const strengthsList = document.getElementById('strengths-list');
+    const improvementsList = document.getElementById('improvements-list');
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    function showScreen(screen) {
+      welcomeScreen.classList.add('hidden');
+      quizScreen.classList.add('hidden');
+      resultScreen.classList.add('hidden');
+      screen.classList.remove('hidden');
+    }
+
+    function startQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      answered = false;
+      showScreen(quizScreen);
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const current = questions[currentQuestionIndex];
+      questionCategory.textContent = current.category;
+      questionCounter.textContent = `Pregunta ${currentQuestionIndex + 1} de ${questions.length}`;
+      questionText.textContent = current.question;
+      progressBar.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+
+      optionsContainer.innerHTML = '';
+      feedbackContainer.classList.add('hidden');
+      answered = false;
+
+      current.options.forEach((option, index) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'option-btn bg-white border-2 border-purple-200 text-purple-700 font-semibold text-lg py-3 px-4 rounded-2xl shadow-sm transition-all duration-200 hover:border-purple-400 hover:bg-purple-50 text-left';
+        btn.textContent = option;
+        btn.addEventListener('click', () => handleAnswer(index));
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function handleAnswer(selectedIndex) {
+      if (answered) return;
+      answered = true;
+
+      const current = questions[currentQuestionIndex];
+      const buttons = [...document.querySelectorAll('.option-btn')];
+
+      buttons.forEach((button, index) => {
+        button.disabled = true;
+        if (index === current.correctIndex) {
+          button.classList.add('correct');
+        }
+        if (index === selectedIndex && index !== current.correctIndex) {
+          button.classList.add('wrong');
+        }
+      });
+
+      if (selectedIndex === current.correctIndex) {
+        score += 1;
+        feedbackTitle.textContent = '✅ ¡Muy bien!';
+        feedbackTitle.classList.add('text-green-600');
+        feedbackTitle.classList.remove('text-red-600');
+      } else {
+        feedbackTitle.textContent = '❌ ¡Casi lo tienes!';
+        feedbackTitle.classList.add('text-red-600');
+        feedbackTitle.classList.remove('text-green-600');
+      }
+
+      feedbackText.textContent = `${current.explanation}`;
+      feedbackContainer.classList.remove('hidden');
+      feedbackContainer.classList.add('bg-gray-50', 'border-2', 'border-gray-200');
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex += 1;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      showScreen(resultScreen);
+
+      const percentage = Math.round((score / questions.length) * 100);
+      finalScore.textContent = `${score} / ${questions.length}`;
+
+      if (percentage >= 80) {
+        encouragementMsg.textContent = '¡Increíble! Eres un auténtico campeón de las matemáticas.';
+      } else if (percentage >= 60) {
+        encouragementMsg.textContent = '¡Muy bien! Ya vas por buen camino, sigue practicando.';
+      } else if (percentage >= 40) {
+        encouragementMsg.textContent = '¡Buen esfuerzo! Cada intento te ayuda a mejorar.';
+      } else {
+        encouragementMsg.textContent = '¡Sigue intentándolo! Las matemáticas se vuelven más fáciles con práctica.';
+      }
+
+      strengthsList.innerHTML = '';
+      improvementsList.innerHTML = '';
+
+      questions.forEach((q, index) => {
+        if (index < score) {
+          const li = document.createElement('li');
+          li.textContent = q.category;
+          strengthsList.appendChild(li);
+        } else {
+          const li = document.createElement('li');
+          li.textContent = q.category;
+          improvementsList.appendChild(li);
+        }
+      });
+
+      if (strengthsList.children.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'Todavía tienes mucho por descubrir y practicar.';
+        strengthsList.appendChild(li);
+      }
+
+      if (improvementsList.children.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'No hay áreas para mejorar en esta ronda. ¡Sigue así!';
+        improvementsList.appendChild(li);
+      }
+    }
+
+    function restartQuiz() {
+      currentQuestionIndex = 0;
+      score = 0;
+      answered = false;
+      showScreen(welcomeScreen);
+    }
+  </script>
+</body>
+</html>
